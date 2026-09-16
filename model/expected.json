@@ -1,0 +1,86 @@
+{
+ "latest_month": "2026-07",
+ "headline_index": 137.1,
+ "headline_yoy_pct": 1.78,
+ "headline_mom_pct": 0.0,
+ "headline_since_dec2019_pct": 12.1,
+ "division_yoy_pct": {
+  "Food & Beverages": 1.77,
+  "Alcoholic Beverages & Tobacco": 2.71,
+  "Clothing & Footwear": 0.11,
+  "Housing, Water, Electricity, Gas & Other Fuels": 1.83,
+  "Furnishings, Household Equipment & Routine Household Maintenance": 0.32,
+  "Health": 1.13,
+  "Transport": 1.39,
+  "Information & Communication": 3.39,
+  "Recreation, Sport & Culture": 1.16,
+  "Education": 2.0,
+  "Restaurant & Accommodation Services": 2.03,
+  "Insurance & Financial Services": 1.11,
+  "Personal Care, Social Protection & Miscellaneous Goods & Services": 2.91
+ },
+ "state_overall_yoy_pct": {
+  "Johor": 2.09,
+  "Kedah": 2.27,
+  "Kelantan": 0.93,
+  "Melaka": 1.76,
+  "Negeri Sembilan": 2.48,
+  "Pahang": 2.34,
+  "Perak": 1.16,
+  "Perlis": 1.27,
+  "Pulau Pinang": 1.6,
+  "Sabah": 1.86,
+  "Sarawak": 0.31,
+  "Selangor": 1.77,
+  "Terengganu": 1.79,
+  "W.P. Kuala Lumpur": 2.15,
+  "W.P. Labuan": 2.01,
+  "W.P. Putrajaya": 1.84
+ },
+ "state_food_yoy_pct": {
+  "Johor": 3.34,
+  "Kedah": 1.76,
+  "Kelantan": 0.0,
+  "Melaka": 2.75,
+  "Negeri Sembilan": 2.63,
+  "Pahang": 2.43,
+  "Perak": 1.44,
+  "Perlis": 1.01,
+  "Pulau Pinang": 1.71,
+  "Sabah": 0.71,
+  "Sarawak": 0.53,
+  "Selangor": 1.45,
+  "Terengganu": 0.88,
+  "W.P. Kuala Lumpur": 2.34,
+  "W.P. Labuan": 0.0,
+  "W.P. Putrajaya": 1.75
+ },
+ "class_since_dec2019_top5": {
+  "Jewellery & watches": 127.51,
+  "Sewage collection": 88.39,
+  "Water supply": 42.49,
+  "Maintenance & repair of personal transport equipment": 40.29,
+  "Services provided by cinemas, theatres & concert venues": 29.58
+ },
+ "class_since_dec2019_bottom5": {
+  "Motorcycles": -26.06,
+  "Mobile telephone equipment": -10.07,
+  "Electricity": -10.06,
+  "Mobile communication services": -8.1,
+  "Equipment for the reception, recording & reproduction of sound & vision": -5.47
+ },
+ "highest_state_overall_yoy": [
+  "Negeri Sembilan",
+  2.48
+ ],
+ "lowest_state_overall_yoy": [
+  "Sarawak",
+  0.31
+ ],
+ "rows": {
+  "FactCPI": 76070,
+  "DimDate": 199,
+  "DimCategory": 162,
+  "DimGeography": 17
+ }
+}

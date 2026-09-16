@@ -1,0 +1,101 @@
+// Basket — DAX measures. Paste each into Power BI Desktop as a New measure on
+// the table named in the comment (Home › New measure), or create a blank
+// "Measures" table and put them all there. Format strings are noted per measure.
+//
+// The model: FactCPI[Index] is a price index (2010 = 100) at one grain —
+// a month × a state × a category. It is never summed. Every measure below
+// evaluates at a single category and state; the report's slicers keep it so.
+
+// ---- The index itself ---------------------------------------------------------
+
+// CPI — the index in the current filter context. Over several months this is
+// their average, which is only meaningful as a smoothing; the cards use CPI Latest.
+// Format: 0.0
+CPI = AVERAGE ( FactCPI[Index] )
+
+// CPI Latest — the index at the last month in the current date context (the
+// latest month overall when no date filter is applied).
+// Format: 0.0
+CPI Latest = CALCULATE ( [CPI], LASTDATE ( DimDate[Date] ) )
+
+// Latest Month — label for cards and titles, e.g. "Jul 2026".
+// Format: text
+Latest Month = CALCULATE ( MAX ( DimDate[MonthYear] ), DimDate[IsLatest] = TRUE () )
+
+// ---- Change over time ---------------------------------------------------------
+
+// Format: 0.0
+CPI Year Ago = CALCULATE ( [CPI], DATEADD ( DimDate[Date], -12, MONTH ) )
+
+// Inflation, year on year. This is the number DOSM headlines.
+// Format: 0.0%
+CPI YoY % = DIVIDE ( [CPI] - [CPI Year Ago], [CPI Year Ago] )
+
+// Format: 0.0
+CPI Month Ago = CALCULATE ( [CPI], DATEADD ( DimDate[Date], -1, MONTH ) )
+
+// Format: 0.0%
+CPI MoM % = DIVIDE ( [CPI] - [CPI Month Ago], [CPI Month Ago] )
+
+// Three-month change, annualised: the recent pace, less noisy than MoM and
+// less lagged than YoY.
+// Format: 0.0%
+CPI 3m Annualised % =
+VAR ThreeMonthsAgo = CALCULATE ( [CPI], DATEADD ( DimDate[Date], -3, MONTH ) )
+RETURN
+    IF ( NOT ISBLANK ( ThreeMonthsAgo ), POWER ( DIVIDE ( [CPI], ThreeMonthsAgo ), 4 ) - 1 )
+
+// Cumulative change since December 2019, the last pre-pandemic month: "how much
+// more does this cost than before COVID".
+// Format: 0.0%
+CPI Dec 2019 = CALCULATE ( [CPI], REMOVEFILTERS ( DimDate ), DimDate[IsPrePandemicBase] = TRUE () )
+
+// Format: 0.0%
+CPI Since Dec 2019 % = DIVIDE ( [CPI Latest] - [CPI Dec 2019], [CPI Dec 2019] )
+
+// ---- Comparisons ---------------------------------------------------------------
+
+// The national figure for the same category and month, regardless of which
+// state is selected.
+// Format: 0.0%
+CPI YoY % National =
+CALCULATE ( [CPI YoY %], REMOVEFILTERS ( DimGeography ), DimGeography[StateKey] = "Malaysia" )
+
+// Percentage points above or below the national rate. Positive = this state's
+// prices are rising faster than the country's.
+// Format: +0.00;-0.00;0.00
+CPI YoY vs National (pp) = ( [CPI YoY %] - [CPI YoY % National] ) * 100
+
+// The all-items rate for the same state and month, regardless of category.
+// Format: 0.0%
+CPI YoY % Headline =
+CALCULATE ( [CPI YoY %], REMOVEFILTERS ( DimCategory ), DimCategory[CategoryKey] = "overall" )
+
+// Percentage points above or below headline inflation: is this category
+// leading or lagging the basket.
+// Format: +0.00;-0.00;0.00
+CPI YoY vs Headline (pp) = ( [CPI YoY %] - [CPI YoY % Headline] ) * 100
+
+// Rank of the selected states by year-on-year inflation, 1 = highest. Put a
+// visual-level filter State ≠ Malaysia on any visual that uses it.
+// Format: 0
+State Rank by YoY =
+RANKX ( ALLSELECTED ( DimGeography[State] ), [CPI YoY %], , DESC, DENSE )
+
+// Rank of categories at the selected level by change since Dec 2019.
+// Format: 0
+Category Rank Since Dec 2019 =
+RANKX ( ALLSELECTED ( DimCategory[Category] ), [CPI Since Dec 2019 %], , DESC, DENSE )
+
+// ---- Helpers for titles ----------------------------------------------------------
+
+// e.g. "Food & Beverages · Johor · Jul 2026" — for dynamic visual titles
+// (format the title with fx › this measure).
+Selection Title =
+VAR Cat = SELECTEDVALUE ( DimCategory[Category], "All items" )
+VAR St = SELECTEDVALUE ( DimGeography[State], "Malaysia" )
+RETURN Cat & " · " & St & " · " & [Latest Month]
+
+// Count of months in context: sanity check while building (should be 1 on a card
+// filtered to the latest month, 199 with no date filter).
+Months in Context = COUNTROWS ( DimDate )

@@ -1,0 +1,18 @@
+StateKey,State,Region,Latitude,Longitude,IsNational,SortOrder
+Malaysia,Malaysia,National,4.2105,101.9758,True,0
+Johor,Johor,Southern,1.4854,103.7618,False,1
+Kedah,Kedah,Northern,6.1184,100.3685,False,2
+Kelantan,Kelantan,East Coast,6.1254,102.2381,False,3
+Melaka,Melaka,Southern,2.1896,102.2501,False,4
+Negeri Sembilan,Negeri Sembilan,Southern,2.7258,101.9424,False,5
+Pahang,Pahang,East Coast,3.8077,103.326,False,6
+Perak,Perak,Northern,4.5975,101.0901,False,7
+Perlis,Perlis,Northern,6.4414,100.1986,False,8
+Pulau Pinang,Pulau Pinang,Northern,5.4141,100.3288,False,9
+Sabah,Sabah,East Malaysia,5.9804,116.0735,False,10
+Sarawak,Sarawak,East Malaysia,1.5533,110.3592,False,11
+Selangor,Selangor,Central,3.0738,101.5183,False,12
+Terengganu,Terengganu,East Coast,5.3117,103.1324,False,13
+W.P. Kuala Lumpur,W.P. Kuala Lumpur,Central,3.139,101.6869,False,14
+W.P. Labuan,W.P. Labuan,East Malaysia,5.2831,115.2308,False,15
+W.P. Putrajaya,W.P. Putrajaya,Central,2.9264,101.6964,False,16
