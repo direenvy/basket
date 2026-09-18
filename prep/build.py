@@ -101,6 +101,7 @@ def dim_date(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     df["Month"] = df.Date.dt.strftime("%b")
     df["YearMonth"] = df.Date.dt.strftime("%Y-%m")
     df["MonthYear"] = df.Date.dt.strftime("%b %Y")
+    df["YearMonthNumber"] = df.Date.dt.strftime("%Y%m").astype(int)  # one value per month: what MonthYear sorts by
     df["IsLatest"] = df.Date == end  # the first of the latest month, where the latest facts sit
     df["IsPrePandemicBase"] = df.Date == pd.Timestamp(PRE_PANDEMIC)
     return df

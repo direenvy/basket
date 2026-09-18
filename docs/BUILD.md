@@ -40,8 +40,12 @@ Go to **Model** view.
 2. Mark the date table: select DimDate → **Table tools › Mark as date table** →
    column `Date`. (The YoY and MoM measures depend on this.)
 3. Sort columns: select `DimDate[Month]` → **Column tools › Sort by column** →
-   `MonthNumber`. Same for `DimDate[MonthYear]` → sort by `DateKey`, and
+   `MonthNumber`. Same for `DimDate[MonthYear]` → sort by `YearMonthNumber` (one
+   value per month; `DateKey` will not work because the table is daily), and
    `DimGeography[State]` → sort by `SortOrder`.
+   If `YearMonth` or `MonthYear` were auto-typed as dates on load (they show as
+   "Saturday, 1 May, 2010"), fix them in Transform data: select both columns →
+   **Transform › Data Type › Text › Replace current** → Close & Apply.
 4. Hide the keys from report view (right-click → Hide): `FactCPI[DateKey]`,
    `FactCPI[StateKey]`, `FactCPI[CategoryKey]`, `DimDate[DateKey]`,
    `DimGeography[StateKey]`, `DimCategory[CategoryKey]`, and hide `FactCPI[Index]`
