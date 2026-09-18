@@ -13,10 +13,12 @@
 // Format: 0.0
 CPI = AVERAGE ( FactCPI[Index] )
 
-// CPI Latest — the index at the last month in the current date context (the
-// latest month overall when no date filter is applied).
+// CPI Latest — the index at the last month that has data in the current date
+// context (the latest month overall when no date filter is applied). LASTNONBLANK
+// rather than LASTDATE because the date table is daily and the facts sit on the
+// first of each month.
 // Format: 0.0
-CPI Latest = CALCULATE ( [CPI], LASTDATE ( DimDate[Date] ) )
+CPI Latest = CALCULATE ( [CPI], LASTNONBLANK ( DimDate[Date], [CPI] ) )
 
 // Latest Month — label for cards and titles, e.g. "Jul 2026".
 // Format: text
@@ -97,5 +99,5 @@ VAR St = SELECTEDVALUE ( DimGeography[State], "Malaysia" )
 RETURN Cat & " · " & St & " · " & [Latest Month]
 
 // Count of months in context: sanity check while building (should be 1 on a card
-// filtered to the latest month, 199 with no date filter).
-Months in Context = COUNTROWS ( DimDate )
+// filtered to the latest month, 200 with no date filter).
+Months in Context = DISTINCTCOUNT ( DimDate[YearMonth] )

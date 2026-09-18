@@ -14,20 +14,22 @@ model can be checked while it is built.
 
 ## The question, and what the data already says
 
-Using the figures the model must reproduce (`model/expected.json`, July 2026):
+Using the figures the model must reproduce (`model/expected.json`, August 2026 —
+the build script fetches the latest month, so these move each release):
 
-- **Headline inflation is 1.78% year on year**, and 0.0% month on month; the basket
-  costs 12.1% more than in December 2019, the last pre-pandemic month.
-- **The basket is not rising evenly.** Information & Communication (+3.4%) and
-  Personal Care (+2.9%) lead; Clothing & Footwear (+0.1%) and Furnishings (+0.3%)
-  are flat. Food & Beverages sits almost exactly on the headline at 1.8%.
+- **Headline inflation is 1.93% year on year**, 0.29% month on month; the basket
+  costs 12.4% more than in December 2019, the last pre-pandemic month.
+- **The basket is not rising evenly.** Personal Care (+3.2%), Alcoholic Beverages &
+  Tobacco (+2.8%) and Information & Communication (+2.6%) lead; Clothing & Footwear
+  (+0.1%) and Furnishings (+0.4%) are flat. Food & Beverages sits on the headline at
+  1.9%.
 - **Location matters more than the national number suggests.** Negeri Sembilan is
-  running at 2.5% and Sarawak at 0.3% — an eightfold spread inside one country.
-  For food specifically, Johor is at 3.3% while Kelantan and Labuan are at 0.0%.
+  running at 2.6% and Sarawak at 0.5% — a fivefold spread inside one country. For
+  food specifically, Johor is at 3.5% while Kelantan is at −0.1%.
 - **Since December 2019 the biggest movers are not food.** Jewellery & watches
-  +127% (gold), sewage collection +88% and water supply +42% (tariff resets),
-  vehicle maintenance +40%. Motorcycles are 26% *cheaper*, and electricity 10%
-  cheaper, than before the pandemic.
+  +132% (gold), sewage collection +88% and water supply +42% (tariff resets),
+  vehicle maintenance +41%. Mobile phones and electricity are 10% *cheaper* than
+  before the pandemic.
 
 A retailer reading this sets regional price reviews by state, not by a national
 CPI print; a budget officer sees that the "cost of living" story is a handful of
@@ -36,16 +38,18 @@ administered prices and gold, not groceries.
 ## The model
 
 ```
-            DimDate (199 months, marked as date table)
+            DimDate (6,087 days, marked as date table)
                 │ DateKey
-DimGeography ───┤ StateKey ──── FactCPI (76,070 rows: DateKey · StateKey · CategoryKey · Index)
+DimGeography ───┤ StateKey ──── FactCPI (76,456 rows: DateKey · StateKey · CategoryKey · Index)
 (17: 16 states  │ CategoryKey
  + Malaysia)    │
             DimCategory (162: All items · 13 divisions · 47 groups · 101 classes, MCOICOP, EN + BM)
 ```
 
-- **Grain:** one row per month × state × category. The index is 2010 = 100 and is
-  never summed; every measure evaluates at a single category and state.
+- **Grain:** one row per month × state × category, keyed to the first day of the
+  month in a gap-free daily date table (Power BI will not mark a monthly table as a
+  date table). The index is 2010 = 100 and is never summed; every measure evaluates
+  at a single category and state.
 - **Ragged hierarchy handled honestly.** State data exists at division level only;
   groups and classes exist nationally only. DimCategory carries a `Level` column and
   the parents' names on every row, so the report filters by level instead of
@@ -108,6 +112,6 @@ model is in version control and not only the screenshots.
 - *Consumer Price Index* by division, group, class and by state × division, and the
   MCOICOP lookup — Department of Statistics Malaysia via
   [data.gov.my](https://open.dosm.gov.my/data-catalogue/cpi_2d), CC BY 4.0.
-  Monthly, base 2010 = 100, to July 2026.
+  Monthly, base 2010 = 100, to August 2026 at the time of writing.
 - State capital coordinates for the map are approximate and in `prep/build.py`.
 - Design: the New Genre reference in `DESIGN.md`.

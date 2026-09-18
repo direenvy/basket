@@ -10,6 +10,10 @@ https://powerbi.microsoft.com/desktop. Windows only.
 
 ## 1. Load the data (10 min)
 
+Simplest: **Home › Get data › Excel workbook** → `model/basket.xlsx` → tick all four
+sheets → **Load**. Then **Transform data** and check the types as in step 2–3 below
+(`Date` must be **Date**, the code columns **Text**). Or, one CSV at a time:
+
 1. Open Power BI Desktop → blank report → **Home › Get data › Text/CSV**.
 2. Load `model/FactCPI.csv`. In the preview, click **Transform Data** and check the
    column types: `DateKey` **Whole number**, `StateKey` **Text**, `CategoryKey` **Text**
@@ -20,8 +24,9 @@ https://powerbi.microsoft.com/desktop. Windows only.
    `LevelOrder` → Whole number), `DimGeography.csv` (`Latitude`/`Longitude` → Decimal,
    `IsNational` → True/False, `SortOrder` → Whole number).
 
-Check: **Data** view → FactCPI has 76,070 rows, DimDate 199, DimCategory 162,
-DimGeography 17 (`expected.json` → `rows`).
+Check: **Data** view → FactCPI has 76,456 rows, DimDate 6,087 (one per day —
+Power BI needs a gap-free daily date table; the facts sit on the first of each
+month), DimCategory 162, DimGeography 17 (`expected.json` → `rows`).
 
 ## 2. Model (15 min)
 
@@ -59,13 +64,15 @@ Check as you go — put a **Card** on the page with the measure and a slicer on
 
 | Measure | Expected (`expected.json`) |
 |---|---|
-| CPI Latest | `headline_index` — 137.1 |
-| CPI YoY % (with a slicer `DimDate[IsLatest]` = True) | `headline_yoy_pct` — 1.78% |
-| CPI MoM % (same) | `headline_mom_pct` — 0.0% |
-| CPI Since Dec 2019 % | `headline_since_dec2019_pct` — 12.1% |
-| Latest Month | `latest_month` — Jul 2026 |
+| CPI Latest | `headline_index` — 137.5 |
+| CPI YoY % (with a slicer `DimDate[IsLatest]` = True) | `headline_yoy_pct` — 1.93% |
+| CPI MoM % (same) | `headline_mom_pct` — 0.29% |
+| CPI Since Dec 2019 % | `headline_since_dec2019_pct` — 12.4% |
+| Latest Month | `latest_month` — Aug 2026 |
 
 If YoY shows blank, the date table is not marked or `Date` is not a Date type.
+If *Mark as date table* says "can't have gaps", DimDate is an old monthly version —
+rebuild it with `python prep/build.py` and Refresh.
 If CPI Latest shows the wrong month, a date slicer is limiting the context.
 
 ## 4. Theme and canvas (5 min)
@@ -94,8 +101,8 @@ follow across pages.
 - A **Clustered bar chart**: Y = `DimCategory[Category]`, X = `CPI YoY %`,
   visual-level filters `DimCategory[Level]` = Division and `DimDate[IsLatest]` =
   True, sorted descending. This is the "which divisions lead the basket" view; the
-  expected order is in `expected.json › division_yoy_pct` (Information &
-  Communication first, Clothing & Footwear last, in Jul 2026).
+  expected order is in `expected.json › division_yoy_pct` (Personal Care first,
+  Clothing & Footwear last, in Aug 2026).
 - A **Text box** bottom-left: "Source: DOSM Consumer Price Index via data.gov.my,
   CC BY 4.0. Data to {Latest Month}." (use a card for the month or type it).
 
@@ -110,18 +117,19 @@ follow across pages.
   the pp column: data bars, one colour (`#5a769f`).
 - A **Clustered bar chart** of states by `CPI YoY %` (sorted), with the Category
   slicer set to Food & Beverages by default for this page — that is the view a
-  retailer wants. Expected: `expected.json › state_food_yoy_pct` (Johor highest,
-  Kelantan and Labuan at 0.0% in Jul 2026).
+  retailer wants. Expected: `expected.json › state_food_yoy_pct` (Johor highest at 3.5%,
+  Kelantan lowest at −0.1% in Aug 2026).
 
 ### Page 3 — What got expensive
 
 - **Clustered bar chart**: Y = `DimCategory[Category]`, X = `CPI Since Dec 2019 %`,
   visual-level filters `DimCategory[Level]` = Class, `DimGeography[State]` = Malaysia,
   **Top N** = 10 by `CPI Since Dec 2019 %`. Title "Ten classes that rose most since
-  Dec 2019". Expected: Jewellery & watches +127.5%, Sewage collection +88.4%, Water
+  Dec 2019". Expected: Jewellery & watches +131.8%, Sewage collection +88.4%, Water
   supply +42.5% …
 - A second bar chart with **Bottom N** = 10: "…and ten that fell". Expected:
-  Motorcycles −26.1%, Mobile telephone equipment −10.1%, Electricity −10.1% …
+  Mobile telephone equipment −10.1%, Electricity −10.0%, Mobile communication
+  services −8.1% …
 - A **Matrix**: rows `DimCategory[Division]` then `Group` then `Class` (this works as
   a matrix because each row filters to its own level via the `Level` field — put
   `DimCategory[Level]` = Class in the visual filter and use `Path` as the single row
@@ -139,9 +147,9 @@ follow across pages.
 ## 6. Check against expected.json (5 min)
 
 With State = Malaysia, Category = All items and no date filter:
-`CPI Latest` 137.1, `CPI Since Dec 2019 %` 12.1%. With `DimDate[IsLatest]` on the
-page: `CPI YoY %` 1.78%. Switch State to Negeri Sembilan: `CPI YoY %` 2.48%
-(`highest_state_overall_yoy`); Sarawak: 0.31%. If any differ, the culprit is
+`CPI Latest` 137.5, `CPI Since Dec 2019 %` 12.4%. With `DimDate[IsLatest]` on the
+page: `CPI YoY %` 1.93%. Switch State to Negeri Sembilan: `CPI YoY %` 2.55%
+(`highest_state_overall_yoy`); Sarawak: 0.54%. If any differ, the culprit is
 almost always the relationship direction or an unmarked date table.
 
 ## 7. Save and publish (10 min)

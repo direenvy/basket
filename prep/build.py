@@ -87,9 +87,13 @@ def dim_geography() -> pd.DataFrame:
 
 
 def dim_date(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
-    idx = pd.date_range(start, end, freq="MS")
+    """Daily, with no gaps: Power BI refuses to mark a table with gaps as a date
+    table and DATEADD needs contiguous days. The facts sit on the first of each
+    month; the other days carry no facts and never appear in a visual."""
+    idx = pd.date_range(start, end + pd.offsets.MonthEnd(0), freq="D")
     df = pd.DataFrame({"Date": idx})
     df["DateKey"] = df.Date.dt.strftime("%Y%m%d").astype(int)
+    df["IsMonthStart"] = df.Date.dt.day == 1
     df["Year"] = df.Date.dt.year
     df["Quarter"] = "Q" + df.Date.dt.quarter.astype(str)
     df["YearQuarter"] = df.Year.astype(str) + " " + df.Quarter
@@ -97,7 +101,7 @@ def dim_date(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     df["Month"] = df.Date.dt.strftime("%b")
     df["YearMonth"] = df.Date.dt.strftime("%Y-%m")
     df["MonthYear"] = df.Date.dt.strftime("%b %Y")
-    df["IsLatest"] = df.Date == end
+    df["IsLatest"] = df.Date == end  # the first of the latest month, where the latest facts sit
     df["IsPrePandemicBase"] = df.Date == pd.Timestamp(PRE_PANDEMIC)
     return df
 
@@ -175,6 +179,13 @@ def main() -> None:
     cat.to_csv(MODEL / "DimCategory.csv", index=False, lineterminator="\n")
     geo.to_csv(MODEL / "DimGeography.csv", index=False, lineterminator="\n")
     dates.assign(Date=dates.Date.dt.strftime("%Y-%m-%d")).to_csv(MODEL / "DimDate.csv", index=False, lineterminator="\n")
+    # One workbook, four sheets: a single Get Data step in Power BI Desktop. Dates as
+    # ISO text so the Excel connector types them as dates rather than serial numbers.
+    with pd.ExcelWriter(MODEL / "basket.xlsx", engine="openpyxl") as xw:
+        f.to_excel(xw, sheet_name="FactCPI", index=False)
+        dates.assign(Date=dates.Date.dt.strftime("%Y-%m-%d")).to_excel(xw, sheet_name="DimDate", index=False)
+        cat.to_excel(xw, sheet_name="DimCategory", index=False)
+        geo.to_excel(xw, sheet_name="DimGeography", index=False)
     exp = expected(f, cat, dates)
     (MODEL / "expected.json").write_text(json.dumps(exp, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"FactCPI {len(f):,} rows · DimDate {len(dates)} · DimCategory {len(cat)} · DimGeography {len(geo)}")
