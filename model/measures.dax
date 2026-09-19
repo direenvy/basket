@@ -79,15 +79,18 @@ CALCULATE ( [CPI YoY %], REMOVEFILTERS ( DimCategory ), DimCategory[CategoryKey]
 CPI YoY vs Headline (pp) = ( [CPI YoY %] - [CPI YoY % Headline] ) * 100
 
 // Rank of the selected states by year-on-year inflation, 1 = highest. Put a
-// visual-level filter State ≠ Malaysia on any visual that uses it.
+// visual-level filter IsNational = False on any visual that uses it. Iterates the
+// whole table, not just [State]: State is sorted by SortOrder, so a table row also
+// filters SortOrder, and ALLSELECTED on the one column would leave every state
+// ranked against itself (rank 1 everywhere).
 // Format: 0
 State Rank by YoY =
-RANKX ( ALLSELECTED ( DimGeography[State] ), [CPI YoY %], , DESC, DENSE )
+RANKX ( ALLSELECTED ( DimGeography ), [CPI YoY %], , DESC, DENSE )
 
 // Rank of categories at the selected level by change since Dec 2019.
 // Format: 0
 Category Rank Since Dec 2019 =
-RANKX ( ALLSELECTED ( DimCategory[Category] ), [CPI Since Dec 2019 %], , DESC, DENSE )
+RANKX ( ALLSELECTED ( DimCategory ), [CPI Since Dec 2019 %], , DESC, DENSE )
 
 // ---- Helpers for titles ----------------------------------------------------------
 
