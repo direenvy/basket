@@ -1,6 +1,8 @@
 # Basket
 
-*Report link and screenshots to follow once the owner has built and published the .pbix — see [docs/BUILD.md](docs/BUILD.md).*
+[![Overview page](docs/overview.png)](docs/overview.png)
+
+**Report:** [`basket.pbix`](basket.pbix) (open in Power BI Desktop) · four pages below · published link to follow.
 
 A Power BI model of Malaysia's Consumer Price Index — every month since 2010, every
 state, and the full MCOICOP basket down to 101 classes — built for the question a
@@ -69,19 +71,54 @@ DimGeography ───┤ StateKey ──── FactCPI (76,456 rows: DateKey ·
 
 ## Pages
 
+Two slicers on every page — State and Category, synced — so the whole report
+answers for whatever the reader picks.
+
 1. **Overview** — the four cards (index, YoY, MoM, since Dec 2019), the YoY line
    since 2011 against a 2% reference, divisions ranked by YoY for the latest month.
-2. **By state** — bubble map and ranked table of states by YoY with the gap to the
-   national rate in percentage points; defaults to Food & Beverages.
-3. **What got expensive** — the ten classes that rose most and the ten that fell
-   since December 2019; a matrix by division › group › class with YoY, the
-   three-month annualised pace and the cumulative change.
-4. **Explorer** — any category, any states side by side, index and YoY over time,
-   with a searchable category slicer.
+   The bar chart ignores the Category slicer, so it always shows the thirteen
+   divisions; the cards and line follow the selection.
+2. **By state** — sixteen states ranked by YoY, coloured by rate, and a table with
+   the gap to the national rate in percentage points (data bars), the rank, and
+   the change since December 2019. Set Category to Food & Beverages for the view
+   a retailer wants: Johor 3.5%, Kelantan −0.1%.
 
-Theme: `theme/basket.json`, the New Genre reference translated for Power BI —
-white canvas, `#f5f5f5` cards, no borders or shadows, Onyx and Slate Veil for
-data, the steel blue for the single accent.
+   [![By state](docs/by-state.png)](docs/by-state.png)
+
+3. **What got expensive** — the ten classes that rose most and the ten that fell
+   since December 2019 (Top N / Bottom N filters over the 101 classes), and a
+   matrix division › group › class with YoY, the three-month annualised pace,
+   the cumulative change and the rank. Subtotals are off on purpose: a division's
+   own index is a separate row in the data, and the average of its classes is not
+   it.
+
+   [![What got expensive](docs/what-got-expensive.png)](docs/what-got-expensive.png)
+
+4. **Explorer** — any of the 162 categories, any states overlaid: the index and
+   the YoY rate over time, one line per state.
+
+   [![Explorer](docs/explorer.png)](docs/explorer.png)
+
+Theme: `theme/basket-colour.json` — pale blue-grey canvas, white cards, navy
+text, indigo / teal / orange / coral for data. `theme/basket.json` is the
+monochrome New Genre version the other projects use; the owner chose colour for
+this one.
+
+## Things the build taught
+
+- **A monthly date table cannot be marked as a date table.** Power BI insists on
+  contiguous days, so DimDate is daily (6,087 rows) with the facts on the first of
+  each month, and `CPI Latest` uses `LASTNONBLANK` rather than `LASTDATE`.
+- **`RANKX` over one column breaks when that column has a Sort-by column.** `State`
+  is sorted by `SortOrder`, so every table row also filters `SortOrder`;
+  `ALLSELECTED(DimGeography[State])` cleared only `State` and ranked every state
+  against itself (1 everywhere). Iterating the whole table fixes it.
+- **A slicer's cross-filter hides values from the Filters pane.** With the Category
+  slicer on Food & Beverages, a visual's `Level` filter offered only *Division* —
+  the interaction has to be switched off before the filter can be set.
+- **A click on a bar is a filter too.** Clicking a division on the Overview chart
+  filtered the cards to that division *and* the slicer's category — an empty
+  intersection. The bar chart's interactions with the cards are off.
 
 ## Building it
 
@@ -90,8 +127,8 @@ writes `model/*.csv` and `model/expected.json`. Then follow
 [docs/BUILD.md](docs/BUILD.md): load, model, paste the measures, apply the theme,
 build the four pages, check against the expected values, publish.
 
-The `.pbix` (and the text-based `.pbip` project) are committed once built, so the
-model is in version control and not only the screenshots.
+`basket.pbix` is committed, so the model is in version control and not only the
+screenshots; the `.pbip` text export is on the list.
 
 ## Limitations
 
