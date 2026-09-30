@@ -2,7 +2,8 @@
 
 [![Overview page](docs/overview.png)](docs/overview.png)
 
-**Report:** [`basket.pbix`](basket.pbix) (open in Power BI Desktop) · four pages below · published link to follow.
+**Live report:** [open the dashboard](https://app.powerbi.com/view?r=eyJrIjoiNTE4MDY3YTktMTQyNC00NDY2LWI5Y2EtZGM3MTgxYjIzMTY1IiwidCI6IjBmZWQwM2EzLTQwMmQtNDYzMy1hOGNkLThiMzA4ODIyMjUzZSIsImMiOjEwfQ%3D%3D) — all four pages, slicers and drill-downs working, no sign-in.
+**Source:** [`basket.pbix`](basket.pbix), committed, opens in Power BI Desktop.
 
 A Power BI model of Malaysia's Consumer Price Index — every month since 2010, every
 state, and the full MCOICOP basket down to 101 classes — built for the question a
@@ -140,9 +141,11 @@ screenshots; the `.pbip` text export is on the list.
   not its contribution to the headline.
 - **Index, not prices.** A 2010 = 100 index says how fast prices move, not what
   they are; Sarawak's low inflation does not mean Sarawak is cheap.
-- **Publishing depends on a work or school account.** Power BI Service does not
-  accept personal addresses; if the university tenant blocks it, the deliverable
-  is the committed `.pbix` and screenshots.
+- **The live link publishes the whole semantic model, not just the pictures.** Anyone
+  with the URL can query every row behind the visuals anonymously. That is acceptable
+  here precisely because the data is already public — DOSM's CPI series under CC BY 4.0,
+  no personal or proprietary figures anywhere in the model — and it would not be
+  acceptable for anything else.
 
 ## Data and licences
 
